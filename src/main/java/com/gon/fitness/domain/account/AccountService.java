@@ -2,7 +2,9 @@ package com.gon.fitness.domain.account;
 
 import com.gon.fitness.web.account.UserAccount;
 import com.gon.fitness.web.account.form.SignUpForm;
+import com.gon.fitness.web.settings.form.ProfileForm;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,7 @@ import java.util.List;
 public class AccountService implements UserDetailsService {
 
     private final JavaMailSender javaMailSender;
+    private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
 
@@ -36,11 +39,12 @@ public class AccountService implements UserDetailsService {
     }
 
 
-    private void processEmailCheck(Account newAccount) {
-        newAccount.generateEmailCheckToken();
+    public void processEmailCheck(Account newAccount) {
+        Account account = accountRepository.findByEmail(newAccount.getEmail());
+        account.generateEmailCheckToken();
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setSubject("스터디올래, 회원 가입 인증");
-        mailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken() + "&email=" + newAccount.getEmail());
+        mailMessage.setText("/check-email-token?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
         javaMailSender.send(mailMessage);
     }
 
@@ -74,6 +78,12 @@ public class AccountService implements UserDetailsService {
 
     }
 
+
+    public void updateProfile(ProfileForm profileForm, Account account) {
+        modelMapper.map(profileForm, account);
+    }
+
+    @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String usernameOrNickname) throws UsernameNotFoundException {
 

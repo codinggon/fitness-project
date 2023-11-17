@@ -1,9 +1,12 @@
 package com.gon.fitness.domain.account;
 
+import com.gon.fitness.domain.Tag;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -59,6 +62,8 @@ public class Account {
 
     private boolean studyUpdatedByWeb = true;
 
+    @ManyToMany
+    private Set<Tag> tags = new HashSet<>();
 
     public void generateEmailCheckToken() {
         String uuid = UUID.randomUUID().toString();

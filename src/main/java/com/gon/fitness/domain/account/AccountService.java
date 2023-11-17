@@ -2,6 +2,8 @@ package com.gon.fitness.domain.account;
 
 import com.gon.fitness.web.account.UserAccount;
 import com.gon.fitness.web.account.form.SignUpForm;
+import com.gon.fitness.web.settings.form.NotificationsForm;
+import com.gon.fitness.web.settings.form.PasswordForm;
 import com.gon.fitness.web.settings.form.ProfileForm;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -96,6 +98,16 @@ public class AccountService implements UserDetailsService {
         }
 
         return new UserAccount(account);
+    }
+
+    public void updatePassword(Account account, PasswordForm passwordForm) {
+        account.setPassword(passwordEncoder.encode(passwordForm.getNewPassword()));
+        accountRepository.save(account);
+    }
+
+    public void updateNotifications(Account account, NotificationsForm notificationsForm) {
+        modelMapper.map(notificationsForm, account);
+        accountRepository.save(account);
     }
 }
 

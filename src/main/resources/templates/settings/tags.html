@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments.html :: head"></head>
+<style>
+    /*.tagify--outside{*/
+    /*    border: 0;*/
+    /*}*/
+
+    /*.tagify--outside .tagify__input{*/
+    /*    order: -1;*/
+    /*    flex: 100%;*/
+    /*    border: 1px solid var(--tags-border-color);*/
+    /*    margin-bottom: 1em;*/
+    /*    transition: .1s;*/
+    /*}*/
+
+    /*.tagify--outside .tagify__input:hover{ border-color:var(--tags-hover-border-color); }*/
+    /*.tagify--outside.tagify--focus .tagify__input{*/
+    /*    transition:0s;*/
+    /*    border-color: var(--tags-focus-border-color);*/
+    /*}*/
+</style>
+
+<body>
+
+    <nav th:replace="fragments.html :: main-nav"></nav>
+
+    <!--내용-->
+    <div class="container">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-2">
+                <div th:replace="fragments.html :: settings-menu(currentMenu='tags')"></div>
+            </div>
+            <div class="col-8">
+
+                <div class="row">
+                    <h2 class="col-12" >관심있는 스터디 주제</h2>
+                </div>
+                <div class="row">
+                    <h2 class="col-9" >관심있는 스터디 주제를 입력하세요.</h2>
+                    <input type="text" id="tags" name="tags"  class='tagify--outside' placeholder='write tags to add below' th:value="${#strings.listJoin(tags,',')}">
+<!--                    <input name='tags-outside' class='tagify&#45;&#45;outside' placeholder='write tags to add below'>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--내용 완료-->
+
+<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+<footer th:replace="fragments.html :: footer"></footer>
+
+<script type="application/javascript" th:replace="fragments.html :: form-validation"></script>
+
+
+<script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<script type="application/javascript" th:inline="javascript">
+    var input = document.querySelector('input[name=tags]')
+
+    $(function() {
+        function tagRequest(url, tagTitle) {
+            $.ajax({
+                dataType: "json",
+                autocomplete: {
+                    enabled: true,
+                    rightKey: true,
+                },
+                contentType: "application/json; charset=utf-8",
+                method: "POST",
+                url: "/settings/tags" + url,
+                data: JSON.stringify({'title': tagTitle})
+            }).done(function (data, status) {
+                console.log("${data} and status is ${status}");
+            });
+        }
+
+        function onRemove(e){
+            console.log('onRemove',e);
+            e.forEach(tag => tagRequest('/remove', tag.value));
+        }
+
+        function onAdd(e){
+            console.log('onAdd',e);
+            e.forEach(tag => tagRequest('/add', tag.value));
+        }
+
+        let whitelist = [[${whitelist}]];
+        let parseVal = JSON.parse(whitelist);
+        console.log('whitelist',parseVal);
+
+        // init Tagify script on the above inputs
+        var tagify = new Tagify(input, {
+            whitelist: parseVal,
+            dropdown: {
+                position: "input",
+                enabled : 0 // always opens dropdown when input gets focus
+            }
+        });
+
+       tagify.on('add',onAddTag)
+           .on('remove',onRemoveTag);
+
+        // 이벤트 리스너 콜백 메소드
+        function onAddTag(e){
+            tagRequest('/add', e.detail.data.value);
+        }
+
+        // tag remvoed callback
+        function onRemoveTag(e){
+            tagRequest('/remove', e.detail.data.value);
+        }
+
+
+
+
+    });
+    //2. insert 부분을 가져와서 whitelist에 반영
+
+
+
+</script>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

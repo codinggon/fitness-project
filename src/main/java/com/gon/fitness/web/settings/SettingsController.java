@@ -3,15 +3,19 @@ package com.gon.fitness.web.settings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gon.fitness.domain.Tag;
+import com.gon.fitness.domain.Zone;
 import com.gon.fitness.domain.account.Account;
 import com.gon.fitness.domain.account.AccountRepository;
 import com.gon.fitness.domain.account.AccountService;
 import com.gon.fitness.domain.settings.TagRepository;
+import com.gon.fitness.domain.settings.ZoneRepository;
 import com.gon.fitness.web.account.CurrentAccount;
 import com.gon.fitness.web.settings.form.NotificationsForm;
 import com.gon.fitness.web.settings.form.PasswordForm;
 import com.gon.fitness.web.settings.form.ProfileForm;
 import com.gon.fitness.web.settings.form.TagForm;
+import com.gon.fitness.web.zone.ZoneForm;
+import com.gon.fitness.web.zone.ZoneService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.Banner;
@@ -26,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.management.Notification;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,6 +40,9 @@ public class SettingsController {
     private final ModelMapper modelMapper;
     private final AccountRepository accountRepository;
     private final TagRepository tagRepository;
+    private final ZoneRepository zoneRepository;
+    private final TagService tagService;
+    private final ZoneService zoneService;
     private final AccountService accountService;
     private final ObjectMapper objectMapper;
 
@@ -61,23 +69,11 @@ public class SettingsController {
     public String updateTagsAdd(@RequestBody TagForm tagForm, Model model) {
 
         Account account = accountRepository.findByNickname("gon");
-
-        String tagTitle = tagForm.getTitle();
-        Tag tag = tagRepository.findByTitle(tagTitle);
-        Tag savedTag = null;
-        if (tag == null) {
-            savedTag = tagRepository.save(Tag.builder().title(tagTitle).build());
-            account.getTags().add(savedTag);
-            accountRepository.save(account);
-        }
-
-        if (!account.getTags().contains(tag)) {
-            account.getTags().add(tag);
-            accountRepository.save(account);
-        }
+        tagService.addTags(tagForm, account);
 
         return "ok";
     }
+
 
     @PostMapping("/settings/tags/remove")
     @ResponseBody
@@ -85,19 +81,50 @@ public class SettingsController {
 
         Account account = accountRepository.findByNickname("gon");
 
-        String tagTitle = tagForm.getTitle();
-        Tag tag = tagRepository.findByTitle(tagTitle);
-        if (tag != null) {
-            account.getTags().remove(tag);
-            accountRepository.save(account);
-        }else{
-            return ResponseEntity.badRequest().body(tagTitle+"이 없습니다.");
-        }
+        tagService.removeTag(tagForm, account);
+
         return ResponseEntity.ok().build();
     }
 
 
 
+
+    @GetMapping("/settings/zones")
+    public String updateZones(@CurrentAccount Account account, Model model) throws JsonProcessingException {
+        Account gon = accountRepository.findByNickname("gon");
+        model.addAttribute(gon);
+
+        List<Zone> all = zoneRepository.findAll();
+        System.out.println("all = " + all);
+
+        List<String> whitelist = all.stream().map(zone -> String.format("%s(%s)/%s", zone.getCity(), zone.getLocalNameOfCity(), zone.getProvince())).collect(Collectors.toList());
+        List<String> getZones = gon.getZones().stream().map(zone -> String.format("%s(%s)/%s", zone.getCity(), zone.getLocalNameOfCity(), zone.getProvince())).collect(Collectors.toList());
+
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(whitelist));
+        model.addAttribute("zones", getZones);
+
+        return "settings/zones";
+    }
+
+    @PostMapping("/settings/zones/add")
+    @ResponseBody
+    public String updateZonesAdd(@RequestBody ZoneForm zoneForm, Model model) {
+
+        Account account = accountRepository.findByNickname("gon");
+        zoneService.addZones(zoneForm, account);
+
+        return "ok";
+    }
+
+    @PostMapping("/settings/zones/remove")
+    @ResponseBody
+    public String updateZonesRemove(@RequestBody ZoneForm zoneForm, Model model) {
+
+        Account account = accountRepository.findByNickname("gon");
+        zoneService.removeZones(zoneForm, account);
+
+        return "ok";
+    }
 
 
 

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments.html :: head"></head>
-
 
 <body>
 
@@ -10,22 +10,30 @@
 
     <!--내용-->
     <div class="container">
-        <div class="row mt-5 justify-content-center">
+        <div th:replace="fragments.html :: study-info"></div>
+        <div th:replace="fragments.html :: study-menu(studyMenu='settings')"></div>
+        <div class="row mt-3 justify-content-center">
             <div class="col-2">
-                <div th:replace="fragments.html :: settings-menu(currentMenu='tags')"></div>
+                <div th:replace="fragments.html :: study-settings-menu(currentMenu='tags')"></div>
             </div>
             <div class="col-8">
-
                 <div class="row">
-                    <h2 class="col-12" >관심있는 스터디 주제</h2>
+                    <h2 class="col-sm-12">스터디 주제</h2>
                 </div>
                 <div class="row">
-                    <h2 class="col-9" >관심있는 스터디 주제를 입력하세요.</h2>
-                    <input type="text" id="tags" name="tags"  class='tagify--outside' placeholder='write tags to add below' th:value="${#strings.listJoin(tags,',')}">
-<!--                    <input name='tags-outside' class='tagify&#45;&#45;outside' placeholder='write tags to add below'>-->
+                    <div class="col-sm-12">
+                        <div class="alert alert-info" role="alert">
+                            스터디에서 주로 다루는 주제를 태그로 등록하세요. 태그를 입력하고 콤마(,) 또는 엔터를 입력하세요.
+                        </div>
+                        <div id="whitelist" th:text="${whitelist}" hidden>
+                        </div>
+                        <input id="tags" type="text" name="tags" th:value="${#strings.listJoin(tags, ',')}"
+                               class="tagify-outside" aria-describedby="tagHelp">
+                    </div>
                 </div>
             </div>
         </div>
+        <div th:replace="fragments.html :: footer"></div>
     </div>
 
     <!--내용 완료-->
@@ -38,7 +46,6 @@
 <footer th:replace="fragments.html :: footer"></footer>
 
 <script type="application/javascript" th:replace="fragments.html :: form-validation"></script>
-
 
 <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
 <script th:replace="fragments.html :: ajax-csrf-header"></script>
@@ -55,7 +62,7 @@
                 },
                 contentType: "application/json; charset=utf-8",
                 method: "POST",
-                url: "/settings/tags" + url,
+                url: "/study/" + [[${study.path}]] + "/tags" + url,
                 data: JSON.stringify({'title': tagTitle})
             }).done(function (data, status) {
                 console.log("${data} and status is ${status}");
@@ -85,8 +92,8 @@
             }
         });
 
-       tagify.on('add',onAddTag)
-           .on('remove',onRemoveTag);
+        tagify.on('add',onAddTag)
+            .on('remove',onRemoveTag);
 
         // 이벤트 리스너 콜백 메소드
         function onAddTag(e){

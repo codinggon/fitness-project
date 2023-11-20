@@ -6,6 +6,7 @@ import com.gon.fitness.domain.account.AccountService;
 import com.gon.fitness.web.account.form.SignUpForm;
 import com.gon.fitness.web.account.validator.SignUpFormValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -21,6 +22,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AccountController {
 
+    private final JavaMailSender javaMailSender;
     private final SignUpFormValidator signUpFormValidator;
     private final AccountRepository accountRepository;
     private final AccountService accountService;

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments.html :: head"></head>
+
+<body>
+
+    <nav th:replace="fragments.html :: main-nav"></nav>
+
+    <!--내용-->
+
+    <div class="container">
+        <div th:replace="fragments.html :: study-info"></div>
+        <div th:replace="fragments.html :: study-menu(studyMenu='members')"></div>
+
+        <div th:replace="fragments.html :: member-list(members=${study.managers},isManager=${true})"></div>
+        <div th:replace="fragments.html :: member-list(members=${study.members},isManager=${false})"></div>
+
+    </div>
+
+
+    <!--내용 완료-->
+
+<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+<footer th:replace="fragments.html :: footer"></footer>
+
+<script type="application/javascript" th:replace="fragments.html :: form-validation"></script>
+
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 package com.gon.fitness.domain.account;
 
 import com.gon.fitness.domain.Tag;
+import com.gon.fitness.domain.Zone;
 import lombok.*;
 
 import javax.persistence.*;
@@ -65,6 +66,11 @@ public class Account {
     @ManyToMany
     private Set<Tag> tags = new HashSet<>();
 
+    @ManyToMany
+    private Set<Zone> zones = new HashSet<>();
+
+
+
     public void generateEmailCheckToken() {
         String uuid = UUID.randomUUID().toString();
         this.emailCheckToken = uuid;
@@ -79,5 +85,10 @@ public class Account {
         //생성시간 이전이면 현재시간 - 1시간
         //현재시간 이후면 생성시간 + 1
         return LocalDateTime.now().isAfter(this.emailCheckTokenGeneratedAt.plusHours(1));
+    }
+
+
+    public boolean isContainTag(Tag tag) {
+        return getTags().contains(tag);
     }
 }

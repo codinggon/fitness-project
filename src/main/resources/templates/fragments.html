@@ -8,7 +8,8 @@
     <title>Title</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">">
+    <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote.min.css">
 
 </head>
 
@@ -36,7 +37,7 @@
                     <a class="dropdown-item" sec:authorize="!isAuthenticated()" href="#" th:href="@{/login}">login</a>
                     <a class="dropdown-item" sec:authorize="!isAuthenticated()" href="#" th:href="@{/sign-up}">register</a>
                     <a class="dropdown-item" sec:authorize="isAuthenticated()" href="#" th:href="@{/notification}">알림</a>
-                    <a class="dropdown-item" sec:authorize="isAuthenticated()" href="#" th:href="@{/notification}">스터디 개설</a>
+                    <a class="dropdown-item" sec:authorize="isAuthenticated()" href="#" th:href="@{/new-study}">스터디 개설</a>
                     <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
                         <button class="dropdown-item" type="submit">로그아웃</button>
                     </form>
@@ -213,13 +214,13 @@
 
 <div th:fragment="study-settings-menu (currentMenu)" class="list-group">
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'description'}? active"
-       href="#" th:href="@{|/study/${study.path}/settings/description|}">소개</a>
+       href="#" th:href="@{|/study/${study.path}/description|}">소개</a>
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'image'}? active"
        href="#" th:href="@{'/study/' + ${study.path} + '/settings/banner'}">배너 이미지</a>
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active"
-       href="#" th:href="@{'/study/' + ${study.path} + '/settings/tags'}">스터디 주제</a>
+       href="#" th:href="@{'/study/' + ${study.path} + '/tags'}">스터디 주제</a>
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active"
-       href="#" th:href="@{'/study/' + ${study.path} + '/settings/zones'}">활동 지역</a>
+       href="#" th:href="@{'/study/' + ${study.path} + '/zones'}">활동 지역</a>
     <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'study'}? active"
        href="#" th:href="@{'/study/' + ${study.path} + '/settings/study'}">스터디</a>
 </div>

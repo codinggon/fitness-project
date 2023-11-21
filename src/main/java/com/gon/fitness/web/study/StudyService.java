@@ -86,4 +86,14 @@ public class StudyService {
     public void stopRecruit(Study study) {
         study.stopRecruit();
     }
+
+    public void addMember(Account account, Study study) {
+        study.getMembers().add(account);
+    }
+
+
+    public void leaveMember(Account account, Study study) {
+        study.getMembers().remove(account);
+    }
+
 }
